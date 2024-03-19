@@ -40,18 +40,18 @@ func (ts *TodoServices) CreateTodo(t Todo) (Todo, error) {
 	}
 
 	defer stmt.Close()
-
+	var todo Todo
 	err = stmt.QueryRow(
 		t.CreatedBy,
 		t.Title,
 		t.Description,
 	).Scan(
-		&ts.Todo.ID,
-		&ts.Todo.CreatedBy,
-		&ts.Todo.Title,
-		&ts.Todo.Description,
-		&ts.Todo.Status,
-		&ts.Todo.CreatedAt,
+		&todo.ID,
+		&todo.CreatedBy,
+		&todo.Title,
+		&todo.Description,
+		&todo.Status,
+		&todo.CreatedAt,
 	)
 	if err != nil {
 		return Todo{}, err

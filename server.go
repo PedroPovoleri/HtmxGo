@@ -19,10 +19,14 @@ func main() {
 		e.Logger.Fatalf("failed to create store: %s", err)
 	}
 
-	ts = services.TodoServices(services.Todo{}, store)
-	th = handlers.NewTaskHandler(ts)
+	var todoService = services.TodoServices{
+		Todo:      services.Todo{},
+		TodoStore: store,
+	}
 
-	handlers.SetupRoutes(e, th)
+	var taskHandler = handlers.NewTaskHandler(todoService)
+
+	handlers.SetupRoutes(e, taskHandler)
 
 	e.Logger.Fatal(e.Start(":1323"))
 }
