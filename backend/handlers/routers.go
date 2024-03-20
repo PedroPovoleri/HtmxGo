@@ -14,7 +14,7 @@ var (
 func SetupRoutes(e *echo.Echo, th *TaskHandler) {
 
 	e.GET("/TODO", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello, World!")
+		return th.GetAllTodos(c)
 	})
 
 	e.POST("/TODO", func(c echo.Context) (err error) {

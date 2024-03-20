@@ -2,7 +2,6 @@ package services
 
 import (
 	"errors"
-	"fmt"
 	"htmx/backend/db"
 	"time"
 )
@@ -60,7 +59,7 @@ func (ts *TodoServices) CreateTodo(t Todo) (Todo, error) {
 }
 
 func (ts *TodoServices) GetAllTodos() ([]Todo, error) {
-	query := fmt.Sprintf("SELECT id, title, status FROM todos WHERE ORDER BY created_at DESC")
+	query := "SELECT id, title, status FROM todos ORDER BY created_at DESC"
 
 	rows, err := ts.TodoStore.Db.Query(query)
 	if err != nil {

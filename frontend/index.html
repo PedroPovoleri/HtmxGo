@@ -42,7 +42,7 @@
         </form>
       </header>
 
-      <ul class="list-group todos mx-auto text-light delete">
+      <ul class="list-group todos mx-auto text-light delete" id="todoList">
         <!-- <li
           class="list-group-item d-flex justify-content-between align-items-center"
         >
@@ -70,7 +70,7 @@
         <input class="form-control m-auto"  type="text" name="task" />
         <br />
         <div class="text-center">
-          <input type="submit" class="btn btn-light" hx-post="/TODO" hx-target=".list-group" hx-swap="outerHTML" />
+          <input type="submit" class="btn btn-light" hx-post="/TODO" hx-target="#todoList"  hx-swap="beforeend"/>
         </div>
       </form>
     </div>

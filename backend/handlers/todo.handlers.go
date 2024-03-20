@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -13,7 +14,7 @@ import (
 
 /********** Handlers for Todo Views **********/
 
-type TaskService interface {
+type TodoServices interface {
 	CreateTodo(t services.Todo) (services.Todo, error)
 	GetAllTodos() ([]services.Todo, error)
 	GetTodoById(t services.Todo) (services.Todo, error)
@@ -21,14 +22,25 @@ type TaskService interface {
 	DeleteTodo(t services.Todo) error
 }
 
-func NewTaskHandler(ts TaskService) *TaskHandler {
+func NewTaskHandler(ts TodoServices) *TaskHandler {
 	return &TaskHandler{
 		TodoServices: ts,
 	}
 }
 
 type TaskHandler struct {
-	TodoServices TaskService
+	TodoServices TodoServices
+}
+
+func (th *TaskHandler) GetAllTodos(c echo.Context) error {
+	todos, _ := th.TodoServices.GetAllTodos()
+	encjson, _ := json.Marshal(todos)
+
+	if len(encjson) == 0 {
+		return c.JSON(http.StatusNotFound, "")
+	}
+
+	return c.JSON(http.StatusOK, encjson)
 }
 
 func (th *TaskHandler) createTodoHandler(c echo.Context) error {

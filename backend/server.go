@@ -10,11 +10,11 @@ import (
 
 func main() {
 	e := echo.New()
-	e.Static("/", "frontend")
+	e.Static("/", "..\\frontend")
 
 	handlers.SetupLogs(e)
 
-	store, err := db.NewStore("PoC")
+	store, err := db.NewStore("todo.sqlite")
 	if err != nil {
 		e.Logger.Fatalf("failed to create store: %s", err)
 	}
@@ -24,7 +24,7 @@ func main() {
 		TodoStore: store,
 	}
 
-	var taskHandler = handlers.NewTaskHandler(todoService)
+	var taskHandler = handlers.NewTaskHandler(&todoService)
 
 	handlers.SetupRoutes(e, taskHandler)
 
