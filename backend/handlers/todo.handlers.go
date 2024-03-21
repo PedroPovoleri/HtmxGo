@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -34,39 +33,34 @@ type TaskHandler struct {
 
 func (th *TaskHandler) GetAllTodos(c echo.Context) error {
 	todos, _ := th.TodoServices.GetAllTodos()
-	encjson, _ := json.Marshal(todos)
-
-	if len(encjson) == 0 {
-		return c.JSON(http.StatusNotFound, "")
+	var html = ""
+	for i := 0; i <= len(todos)-1; i++ {
+		html += "<li class=' list-group-item d-flex justify-content-between align-items-center' ><span>" + todos[i].Title + "</span><i class='far fa-trash-alt delete'></i>"
 	}
 
-	return c.JSON(http.StatusOK, encjson)
+	if len(todos) == 0 {
+		return c.HTML(http.StatusNotFound, "")
+	}
+
+	return c.HTML(http.StatusOK, html)
 }
 
 func (th *TaskHandler) createTodoHandler(c echo.Context) error {
-	isError = false
-
-	if c.Request().Method == "POST" {
-		todo := services.Todo{
-			CreatedBy:   1,
-			Title:       strings.Trim(c.FormValue("title"), " "),
-			Description: strings.Trim(c.FormValue("description"), " "),
-		}
-
-		_, err := th.TodoServices.CreateTodo(todo)
-		if err != nil {
-			return err
-		}
-
-		return c.Redirect(http.StatusSeeOther, "/todo")
+	todo := services.Todo{
+		CreatedBy:   1,
+		Title:       strings.Trim(c.FormValue("title"), " "),
+		Description: strings.Trim(c.FormValue("description"), " "),
 	}
-	return c.Redirect(http.StatusSeeOther, "/todo")
 
+	_, err := th.TodoServices.CreateTodo(todo)
+	if err != nil {
+		return err
+	}
+
+	return c.Redirect(http.StatusSeeOther, "/")
 }
 
 func (th *TaskHandler) todoListHandler(c echo.Context) error {
-	isError = false
-
 	todos, err := th.TodoServices.GetAllTodos()
 	if err != nil {
 		return err
@@ -76,8 +70,6 @@ func (th *TaskHandler) todoListHandler(c echo.Context) error {
 }
 
 func (th *TaskHandler) updateTodoHandler(c echo.Context) error {
-
-	isError = false
 
 	idParams, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -109,29 +101,26 @@ func (th *TaskHandler) updateTodoHandler(c echo.Context) error {
 			))
 	}
 
-	if c.Request().Method == "POST" {
-		var status bool
-		if c.FormValue("status") == "on" {
-			status = true
-		} else {
-			status = false
-		}
-
-		todo := services.Todo{
-			Title:       strings.Trim(c.FormValue("title"), " "),
-			Description: strings.Trim(c.FormValue("description"), " "),
-			Status:      status,
-			ID:          idParams,
-		}
-
-		_, err := th.TodoServices.UpdateTodo(todo)
-		if err != nil {
-			return err
-		}
-
-		return c.Redirect(http.StatusSeeOther, "/todo/list")
+	var status bool
+	if c.FormValue("status") == "on" {
+		status = true
+	} else {
+		status = false
 	}
-	return c.Redirect(http.StatusSeeOther, "/todo/list")
+
+	todo := services.Todo{
+		Title:       strings.Trim(c.FormValue("title"), " "),
+		Description: strings.Trim(c.FormValue("description"), " "),
+		Status:      status,
+		ID:          idParams,
+	}
+
+	_, err = th.TodoServices.UpdateTodo(todo)
+	if err != nil {
+		return err
+	}
+
+	return c.Redirect(http.StatusSeeOther, "/")
 }
 
 func (th *TaskHandler) deleteTodoHandler(c echo.Context) error {
@@ -166,5 +155,5 @@ func (th *TaskHandler) deleteTodoHandler(c echo.Context) error {
 			))
 	}
 
-	return c.Redirect(http.StatusSeeOther, "/todo/list")
+	return c.Redirect(http.StatusSeeOther, "/")
 }

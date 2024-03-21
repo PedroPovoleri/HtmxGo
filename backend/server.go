@@ -14,7 +14,7 @@ func main() {
 
 	handlers.SetupLogs(e)
 
-	store, err := db.NewStore("todo.sqlite")
+	store, err := db.NewStore("..\\data\\todo.sqlite")
 	if err != nil {
 		e.Logger.Fatalf("failed to create store: %s", err)
 	}

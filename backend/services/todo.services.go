@@ -29,23 +29,24 @@ type TodoServices struct {
 }
 
 func (ts *TodoServices) CreateTodo(t Todo) (Todo, error) {
-
-	query := `INSERT INTO todos (created_by, title, description)
-		VALUES(?, ?, ?) RETURNING *`
+	query := `INSERT INTO todos ( created_by, title, description)
+		VALUES( ?, ?, ?) `
 
 	stmt, err := ts.TodoStore.Db.Prepare(query)
 	if err != nil {
 		return Todo{}, err
 	}
-
 	defer stmt.Close()
+	if err != nil {
+		return Todo{}, err
+	}
+
 	var todo Todo
 	err = stmt.QueryRow(
 		t.CreatedBy,
 		t.Title,
 		t.Description,
 	).Scan(
-		&todo.ID,
 		&todo.CreatedBy,
 		&todo.Title,
 		&todo.Description,
@@ -55,7 +56,8 @@ func (ts *TodoServices) CreateTodo(t Todo) (Todo, error) {
 	if err != nil {
 		return Todo{}, err
 	}
-	return ts.Todo, nil
+
+	return todo, nil
 }
 
 func (ts *TodoServices) GetAllTodos() ([]Todo, error) {
@@ -160,6 +162,23 @@ func (ts *TodoServices) DeleteTodo(t Todo) error {
 	}
 
 	return nil
+}
+
+func (ts *TodoServices) GetNextId() (int, error) {
+
+	query := `SELECT Max(id) +1 as id FROM todos`
+	rows, err := ts.TodoStore.Db.Query(query)
+	if err != nil {
+		return 0, err
+	}
+	defer rows.Close()
+
+	var id int
+	for rows.Next() {
+		rows.Scan(&id)
+	}
+
+	return id, nil
 }
 
 func ConvertDateTime(tz string, dt time.Time) string {
